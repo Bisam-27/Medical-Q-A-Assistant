@@ -6,7 +6,7 @@ try:
     import streamlit as st
     GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 except:
-    GEMINI_API_KEY = "AIzaSyAZDBX3kN86jDPUzRlHmGEkotE8_DT11Ok"
+    GEMINI_API_KEY = "Your_API_KEY"
 
 # Model configuration
 MODEL_NAME = "gemini-2.5-flash"
