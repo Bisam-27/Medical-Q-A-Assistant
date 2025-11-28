@@ -6,34 +6,40 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent))
 
 from rag_pipeline import MedicalRAG
+import config
 
 st.set_page_config(page_title="Medical Q&A Assistant", page_icon="🏥")
 
 @st.cache_resource
 def load_rag_system():
     # Check if data exists, if not show setup instructions
-    if not config.VECTOR_STORE_PATH.exists():
-        st.error("Data not found. Please run setup first.")
-        st.code("""
-# Run these commands locally first:
+    try:
+        if not config.VECTOR_STORE_PATH.exists():
+            st.error("⚠️ Vector store not found!")
+            st.info("Please run the following commands first:")
+            st.code("""
+# In the project directory, run:
 python src/preprocess.py
 python src/build_vector_store.py
-        """)
-        st.stop()
-    
-    return MedicalRAG()
+            """)
+            return None
+        
+        # Try to load the RAG system
+        return MedicalRAG()
+        
+    except Exception as e:
+        st.error(f"Error setting up system: {str(e)}")
+        return None
 
 def main():
     st.title("🏥 Medical Q&A Assistant")
     st.write("Ask medical questions and get evidence-based answers")
     
     # Load RAG system
-    try:
-        rag = load_rag_system()
-    except Exception as e:
-        st.error(f"Error loading system: {str(e)}")
-        st.info("Make sure you have run the preprocessing and vector store creation scripts first.")
-        return
+    rag = load_rag_system()
+    
+    if rag is None:
+        st.stop()  # Stop execution if system couldn't load
     
     # Question input
     question = st.text_area(
